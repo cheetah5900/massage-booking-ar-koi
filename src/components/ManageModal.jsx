@@ -226,18 +226,6 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
                         required
                       />
                     </div>
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                      <label className="form-label">สถานะเริ่มต้น</label>
-                      <select
-                        name="status"
-                        value={newFormData.status}
-                        onChange={handleNewChange}
-                        className="form-select"
-                      >
-                        <option value="active">พร้อมทำงาน</option>
-                        <option value="inactive">ไม่พร้อมทำงาน</option>
-                      </select>
-                    </div>
                   </div>
                 )}
 
@@ -355,12 +343,40 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
                             </div>
                           )}
 
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px' }}>
-                            <button className="btn-icon" onClick={saveEdit} title="บันทึก" style={{ padding: '4px' }}>
-                              <Check size={16} color="var(--color-sage)" />
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                            <button 
+                              className="btn-icon" 
+                              onClick={saveEdit} 
+                              title="บันทึก" 
+                              style={{ 
+                                width: '38px', 
+                                height: '38px', 
+                                borderRadius: '8px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                border: '1px solid var(--border-color)',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Check size={18} color="var(--color-sage)" />
                             </button>
-                            <button className="btn-icon" onClick={() => setEditingId(null)} title="ยกเลิก" style={{ padding: '4px' }}>
-                              <X size={16} color="var(--color-coral)" />
+                            <button 
+                              className="btn-icon" 
+                              onClick={() => setEditingId(null)} 
+                              title="ยกเลิก" 
+                              style={{ 
+                                width: '38px', 
+                                height: '38px', 
+                                borderRadius: '8px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                border: '1px solid var(--border-color)',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <X size={18} color="var(--color-coral)" />
                             </button>
                           </div>
                         </div>
@@ -410,20 +426,44 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
                               {isDuration && `ตัวเลือกระยะเวลานวดสำหรับหน้าจอง`}
                             </span>
                           </div>
-                          <div className="manage-item-actions" style={{ display: 'flex', gap: '4px' }}>
-                            <button className="btn-icon" onClick={() => startEdit(item)} title="แก้ไข">
-                              <Edit2 size={14} />
+                          <div className="manage-item-actions" style={{ display: 'flex', gap: '8px' }}>
+                            <button 
+                              className="btn-icon" 
+                              onClick={() => startEdit(item)} 
+                              title="แก้ไข"
+                              style={{ 
+                                width: '38px', 
+                                height: '38px', 
+                                borderRadius: '8px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                backgroundColor: 'var(--bg-secondary)',
+                                border: '1px solid var(--border-color)',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Edit2 size={18} />
                             </button>
                             <button 
                               className={`btn-icon delete ${inUse ? 'disabled' : ''}`} 
                               onClick={() => handleDeleteItem(item.id)} 
                               title={inUse ? "ไม่สามารถลบได้เนื่องจากมีคิวจองที่ใช้อยู่" : "ลบรายการ"}
-                              style={{
+                              style={{ 
+                                width: '38px', 
+                                height: '38px', 
+                                borderRadius: '8px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                backgroundColor: inUse ? 'var(--bg-secondary)' : '#fef2f2',
+                                border: '1px solid ' + (inUse ? 'var(--border-color)' : '#fecaca'),
+                                color: inUse ? 'var(--text-secondary)' : 'var(--color-coral)',
                                 opacity: inUse ? 0.35 : 1,
                                 cursor: inUse ? 'not-allowed' : 'pointer'
                               }}
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={18} />
                             </button>
                           </div>
                         </>

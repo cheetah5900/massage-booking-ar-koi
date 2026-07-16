@@ -43,14 +43,7 @@ import puppeteer from 'puppeteer';
       throw new Error(`Expected page header to be "จิรภัทร์", got "${pageTitle}"`);
     }
     
-    // Switch to booking form tab (second button on desktop nav bar: "ตารางลงคิว")
-    console.log('👉 Switching to "ตารางลงคิว" tab...');
-    const tabBtns = await page.$$('.tab-btn');
-    if (tabBtns.length < 2) {
-      throw new Error('Could not find second tab button for "ตารางลงคิว"');
-    }
-    await tabBtns[1].click(); // click second button (ตารางลงคิว)
-    
+
     // 2. Verify timetable container is present
     const timetableVisible = await page.$('.timetable-container') !== null;
     console.log(`📅 Timetable grid rendered: ${timetableVisible}`);

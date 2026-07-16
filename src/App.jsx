@@ -360,58 +360,11 @@ export default function App() {
             <div className="logo-subtitle">Queue Management</div>
           </div>
         </div>
-
-        <div className="header-actions">
-          
-          {/* Desktop Only Actions */}
-          <div className="desktop-only-header-actions">
-            <nav className="tab-nav">
-              <button 
-                className={`tab-btn ${activeTab === 'timetable-only' ? 'active' : ''}`}
-                onClick={() => setActiveTab('timetable-only')}
-              >
-                <Clock size={14} /> ดูตารางคิว
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
-                onClick={() => setActiveTab('schedule')}
-              >
-                <Calendar size={14} /> ตารางลงคิว
-              </button>
-            </nav>
-          </div>
-
-          {/* Mobile Hamburger Button */}
-          <button 
-            className="mobile-hamburger-btn" 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            title="เมนูนำทาง"
-          >
-            <Menu size={22} />
-          </button>
-
-        </div>
         </div>
       </header>
 
       {/* DASHBOARD LAYOUT */}
-      {activeTab === 'timetable-only' ? (
-        /* VIEW TIMETABLE ONLY */
-        <main className="dashboard-grid">
-          <div className="spa-card" style={{ padding: '1.25rem' }}>
-            <Timetable 
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-              bookings={bookings}
-              masseuses={masseuses}
-              services={services}
-              onBookingClick={setSelectedBooking}
-            />
-          </div>
-        </main>
-      ) : (
-        /* QUEUE MANAGEMENT & TIMETABLE */
-        <main className="dashboard-grid">
+      <main className="dashboard-grid">
           
           {/* HORIZONTAL BOOKING FORM */}
           <div className="spa-card" style={{ padding: '0.75rem 1.25rem' }}>
@@ -534,7 +487,6 @@ export default function App() {
             />
           </div>
         </main>
-      )}
 
       {/* --- DIALOG MODALS --- */}
       
@@ -573,39 +525,6 @@ export default function App() {
       />
 
     
-      {/* Mobile Side Drawer Overlay Menu */}
-      {mobileMenuOpen && (
-        <div className="mobile-nav-overlay" onClick={() => setMobileMenuOpen(false)}>
-          <div className="mobile-nav-menu" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-              <span style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '1rem' }}>เมนูควบคุม</span>
-              <button className="btn-close" onClick={() => setMobileMenuOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginBottom: '1.25rem' }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ตารางและการจัดการ</span>
-              <button 
-                className={`mobile-tab-btn ${activeTab === 'timetable-only' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('timetable-only'); setMobileMenuOpen(false); }}
-              >
-                <Clock size={16} /> ดูตารางคิว
-              </button>
-              <button 
-                className={`mobile-tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('schedule'); setMobileMenuOpen(false); }}
-              >
-                <Calendar size={16} /> ตารางลงคิว
-              </button>
-            </div>
-
-
-
-          </div>
-        </div>
-      )}
-</div>
+    </div>
   );
 }
