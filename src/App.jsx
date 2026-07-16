@@ -39,10 +39,7 @@ for (let h = 10; h <= 22; h++) {
 
 export default function App() {
   // --- STATE ---
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loginUsername, setLoginUsername] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
+  const [currentUser, setCurrentUser] = useState({ role: 'admin', displayName: 'ผู้ดูแลระบบ' });
 
   // Data states
   const [masseuses, setMasseuses] = useState([]);
@@ -205,32 +202,6 @@ export default function App() {
 
   // --- ACTIONS ---
 
-  // Handle Login
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setLoginError('');
-    
-    const user = staffUsers.find(
-      u => u.username === loginUsername && u.password === loginPassword
-    );
-
-    if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('spa_current_user', JSON.stringify(user));
-      setLoginUsername('');
-      setLoginPassword('');
-    } else {
-      setLoginError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
-    }
-  };
-
-  // Handle Logout
-  const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('spa_current_user');
-    setActiveTab('timetable-only');
-  };
-
   // Handle service change in booking form
   const handleServiceChange = (serviceId) => {
     setBookingServiceId(serviceId);
@@ -281,7 +252,12 @@ export default function App() {
     const startMin = sh * 60 + sm;
     const endMin = startMin + bookingDuration;
     if (startMin < 10 * 60 || endMin > 24 * 60) {
-      setBookingError('เวลาให้บริการต้องอยู่ระหว่าง 10:00 - 24:00');
+      window.Swal.fire({
+        icon: 'error',
+        title: 'อยู่นอกเวลาทำการ',
+        text: 'เวลาให้บริการต้องอยู่ระหว่าง 10:00 - 24:00',
+        confirmButtonColor: 'var(--color-gold)'
+      });
       return;
     }
 
@@ -289,9 +265,12 @@ export default function App() {
     const conflict = checkMasseuseConflict(bookingMasseuseId, bookingDate, bookingStartTime, bookingDuration);
     if (conflict) {
       const masseuse = masseuses.find(m => m.id === bookingMasseuseId);
-      setBookingError(
-        `คิวทับซ้อน: ${masseuse ? masseuse.nickname : 'หมอนวด'} มีคิวให้บริการแล้วในช่วง ${conflict.startTime} - ${conflict.endTime}`
-      );
+      window.Swal.fire({
+        icon: 'error',
+        title: 'คิวทับซ้อน',
+        text: `คิวทับซ้อน: ${masseuse ? masseuse.nickname : 'หมอนวด'} มีคิวให้บริการแล้วในช่วง ${conflict.startTime} - ${conflict.endTime}`,
+        confirmButtonColor: 'var(--color-gold)'
+      });
       return;
     }
 
@@ -321,7 +300,12 @@ export default function App() {
 
     setBookingSuccess('จองคิวนวดสำเร็จ!');
     setSelectedDate(bookingDate);
-
+    window.Swal.fire({
+      icon: 'success',
+      title: 'จองคิวนวดสำเร็จ!',
+      text: 'คิวได้รับการบันทึกลงตารางแล้ว',
+      confirmButtonColor: 'var(--color-gold)'
+    });
     setTimeout(() => setBookingSuccess(''), 4000);
   };
 
@@ -338,9 +322,12 @@ export default function App() {
 
     if (conflict) {
       const masseuse = masseuses.find(m => m.id === updatedBooking.masseuseId);
-      alert(
-        `ไม่สามารถบันทึกได้เนื่องจากคิวทับซ้อน: ${masseuse ? masseuse.nickname : 'หมอนวด'} ติดคิวในช่วง ${conflict.startTime} - ${conflict.endTime}`
-      );
+      window.Swal.fire({
+        icon: 'error',
+        title: 'คิวทับซ้อน',
+        text: `ไม่สามารถบันทึกได้เนื่องจากคิวทับซ้อน: ${masseuse ? masseuse.nickname : 'หมอนวด'} ติดคิวในช่วง ${conflict.startTime} - ${conflict.endTime}`,
+        confirmButtonColor: 'var(--color-gold)'
+      });
       return;
     }
 
@@ -355,93 +342,7 @@ export default function App() {
     saveBookings(updated);
   };
 
-  // --- RENDER LOGIN IF NOT LOGGED IN ---
-  if (!currentUser) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'radial-gradient(circle, #fbfaf8 0%, #ede6db 100%)',
-        padding: '1.5rem'
-      }}>
-        <div className="spa-card" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem 2rem', position: 'relative' }}>
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--color-gold-light)',
-              color: 'var(--color-gold)',
-              marginBottom: '1rem'
-            }}>
-              <Flower2 size={32} />
-            </div>
-            <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.8rem', fontWeight: 800 }}>จิรภัทร์</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              ระบบจัดการคิวพนักงาน (Staff Portal)
-            </p>
-          </div>
 
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {loginError && (
-              <div style={{
-                color: 'var(--color-coral)',
-                backgroundColor: 'var(--color-coral-light)',
-                padding: '0.6rem 0.8rem',
-                borderRadius: '8px',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                textAlign: 'center'
-              }}>
-                {loginError}
-              </div>
-            )}
-
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">ชื่อผู้ใช้ (Username)</label>
-              <input
-                type="text"
-                value={loginUsername}
-                onChange={(e) => setLoginUsername(e.target.value)}
-                placeholder="เช่น admin, staff1"
-                className="form-input"
-                required
-              />
-            </div>
-
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">รหัสผ่าน (Password)</label>
-              <input
-                type="password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder="ป้อนรหัสผ่าน"
-                className="form-input"
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', padding: '0.85rem' }}>
-              เข้าสู่ระบบ <ChevronRight size={18} />
-            </button>
-          </form>
-
-          <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-            <div>บัญชีทดสอบระบบ:</div>
-            <div style={{ marginTop: '4px' }}>
-              <strong>Admin:</strong> admin / password123 <br />
-              <strong>Staff:</strong> staff1 / 123456
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Calculate statistics for display
   const activeToday = bookings.filter(b => b.date === bookingDate && b.status === 'active').length;
@@ -467,28 +368,20 @@ export default function App() {
           
           {/* Desktop Only Actions */}
           <div className="desktop-only-header-actions">
-            {currentUser.role === 'admin' && (
-              <nav className="tab-nav">
-                <button 
-                  className={`tab-btn ${activeTab === 'timetable-only' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('timetable-only')}
-                >
-                  <Clock size={14} /> ดูตารางคิว
-                </button>
-                <button 
-                  className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('schedule')}
-                >
-                  <Calendar size={14} /> ตารางลงคิว
-                </button>
-                <button 
-                  className={`tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('admin')}
-                >
-                  <Users size={14} /> จัดการระบบผู้ใช้
-                </button>
-              </nav>
-            )}
+            <nav className="tab-nav">
+              <button 
+                className={`tab-btn ${activeTab === 'timetable-only' ? 'active' : ''}`}
+                onClick={() => setActiveTab('timetable-only')}
+              >
+                <Clock size={14} /> ดูตารางคิว
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
+                onClick={() => setActiveTab('schedule')}
+              >
+                <Calendar size={14} /> ตารางลงคิว
+              </button>
+            </nav>
 
             {/* Header Stats Badges */}
             <div className="header-stats" style={{ display: 'flex', gap: '8px', marginRight: '0.75rem', alignItems: 'center' }}>
@@ -498,23 +391,6 @@ export default function App() {
               <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: '100px', backgroundColor: 'var(--color-sage-light)', color: 'var(--color-sage)', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
                 <span style={{ width: '6px', height: '6px', backgroundColor: 'var(--color-sage)', borderRadius: '50%' }}></span> เสร็จ: {completedToday}
               </span>
-            </div>
-
-            {/* User Dropdown Profile section */}
-            <div className="user-selector-wrapper">
-              <User size={14} color="var(--text-secondary)" />
-              <div className="user-info">
-                <span className="user-name">{currentUser.displayName}</span>
-                <span className={`user-role-badge ${currentUser.role}`}>{currentUser.role}</span>
-              </div>
-              <button 
-                className="btn-icon" 
-                onClick={handleLogout} 
-                title="ออกจากระบบ"
-                style={{ marginLeft: '4px' }}
-              >
-                <LogOut size={14} color="var(--color-coral)" />
-              </button>
             </div>
           </div>
 
@@ -532,22 +408,7 @@ export default function App() {
       </header>
 
       {/* DASHBOARD LAYOUT */}
-      {activeTab === 'admin' && currentUser.role === 'admin' ? (
-        /* ADMIN CONFIG PANEL */
-        <main className="right-panel">
-          <div className="panel-title-area">
-            <div>
-              <h2 className="panel-title">ควบคุมและจัดการพนักงาน</h2>
-              <p className="panel-subtitle">แก้ไขชื่อเจ้าของ, เปลี่ยนรหัสผ่าน, เพิ่มบัญชีผู้ใช้</p>
-            </div>
-          </div>
-          <AdminPanel 
-            staffUsers={staffUsers} 
-            onUpdateStaffUsers={saveStaffUsers} 
-            currentUser={currentUser}
-          />
-        </main>
-      ) : activeTab === 'timetable-only' ? (
+      {activeTab === 'timetable-only' ? (
         /* VIEW TIMETABLE ONLY */
         <main className="dashboard-grid">
           <div className="spa-card" style={{ padding: '1.25rem' }}>
@@ -737,29 +598,21 @@ export default function App() {
             </div>
 
             {/* Navigation Tabs */}
-            {currentUser && currentUser.role === 'admin' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginBottom: '1.25rem' }}>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ตารางและการจัดการ</span>
-                <button 
-                  className={`mobile-tab-btn ${activeTab === 'timetable-only' ? 'active' : ''}`}
-                  onClick={() => { setActiveTab('timetable-only'); setMobileMenuOpen(false); }}
-                >
-                  <Clock size={16} /> ดูตารางคิว
-                </button>
-                <button 
-                  className={`mobile-tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
-                  onClick={() => { setActiveTab('schedule'); setMobileMenuOpen(false); }}
-                >
-                  <Calendar size={16} /> ตารางลงคิว
-                </button>
-                <button 
-                  className={`mobile-tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
-                  onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
-                >
-                  <Users size={16} /> จัดการระบบผู้ใช้
-                </button>
-              </div>
-            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginBottom: '1.25rem' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ตารางและการจัดการ</span>
+              <button 
+                className={`mobile-tab-btn ${activeTab === 'timetable-only' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('timetable-only'); setMobileMenuOpen(false); }}
+              >
+                <Clock size={16} /> ดูตารางคิว
+              </button>
+              <button 
+                className={`mobile-tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('schedule'); setMobileMenuOpen(false); }}
+              >
+                <Calendar size={16} /> ตารางลงคิว
+              </button>
+            </div>
 
             {/* Stats */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginBottom: '1.25rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
@@ -771,27 +624,6 @@ export default function App() {
                 <span style={{ flex: 1, fontSize: '0.75rem', fontWeight: 700, padding: '6px 12px', borderRadius: '8px', backgroundColor: 'var(--color-sage-light)', color: 'var(--color-sage)', display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
                   เสร็จ: {completedToday}
                 </span>
-              </div>
-            </div>
-
-            {/* User Account Info & Logout */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: 'auto' }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ผู้ลงชื่อเข้าใช้</span>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <User size={16} color="var(--text-secondary)" />
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{currentUser ? currentUser.displayName : ''}</span>
-                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{currentUser ? currentUser.role : ''}</span>
-                  </div>
-                </div>
-                <button 
-                  className="btn-danger" 
-                  onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                  style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
-                >
-                  <LogOut size={12} /> ออก
-                </button>
               </div>
             </div>
 

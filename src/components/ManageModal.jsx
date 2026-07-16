@@ -87,6 +87,12 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
 
     if (newItem) {
       onSave([...items, newItem]);
+      window.Swal.fire({
+        icon: 'success',
+        title: 'เพิ่มสำเร็จ',
+        text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+        confirmButtonColor: 'var(--color-gold)'
+      });
       
       // Reset Add Form
       setNewFormData({
@@ -106,15 +112,37 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
     if (onDeleteCheck) {
       const conflictMsg = onDeleteCheck(id, type);
       if (conflictMsg) {
-        alert(conflictMsg);
+        window.Swal.fire({
+          icon: 'error',
+          title: 'ไม่สามารถลบได้',
+          text: conflictMsg,
+          confirmButtonColor: 'var(--color-gold)'
+        });
         return;
       }
     }
 
-    if (confirm(`คุณแน่ใจหรือไม่ที่จะลบรายการนี้?`)) {
-      onSave(items.filter(item => item.id !== id));
-      if (editingId === id) setEditingId(null);
-    }
+    window.Swal.fire({
+      title: 'ยืนยันการลบ',
+      text: 'คุณแน่ใจหรือไม่ที่จะลบรายการนี้?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-coral)',
+      cancelButtonColor: 'var(--text-muted)',
+      confirmButtonText: 'ลบ',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onSave(items.filter(item => item.id !== id));
+        if (editingId === id) setEditingId(null);
+        window.Swal.fire({
+          icon: 'success',
+          title: 'ลบสำเร็จ',
+          text: 'ลบข้อมูลเรียบร้อยแล้ว',
+          confirmButtonColor: 'var(--color-gold)'
+        });
+      }
+    });
   };
 
   // Start Editing
@@ -136,6 +164,12 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
 
     onSave(items.map(item => item.id === editingId ? { ...editFormData } : item));
     setEditingId(null);
+    window.Swal.fire({
+      icon: 'success',
+      title: 'แก้ไขสำเร็จ',
+      text: 'อัปเดตข้อมูลเรียบร้อยแล้ว',
+      confirmButtonColor: 'var(--color-gold)'
+    });
   };
 
   return (

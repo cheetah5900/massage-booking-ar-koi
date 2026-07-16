@@ -10,22 +10,23 @@ export default function Timetable({
   onBookingClick 
 }) {
   // Operating hours configuration (10:00 - 01:00 next day)
-  // Total 15 hours = 30 half-hour slots
+  // Total 15 hours = 180 slots (5-minute intervals)
   const START_HOUR = 10;
-  const COLUMN_WIDTH = 45; // width of each 30-min slot in pixels
+  const COLUMN_WIDTH = 12; // width of each 5-min slot in pixels
 
-  // Generate array of 30 half-hour time slots
+  // Generate array of 5-minute time slots
   const timeSlots = [];
   for (let h = 10; h <= 24; h++) {
     let displayHour = h;
     if (h >= 24) displayHour = h - 24;
     const hourStr = String(displayHour).padStart(2, '0');
     
-    timeSlots.push(`${hourStr}:00`);
-    if (h < 24) {
-      timeSlots.push(`${hourStr}:30`);
+    for (let m = 0; m < 60; m += 5) {
+      const minStr = String(m).padStart(2, '0');
+      timeSlots.push(`${hourStr}:${minStr}`);
     }
   }
+  timeSlots.push("01:00");
 
   // Filter active masseuses
   const activeMasseuses = masseuses.filter(m => m.status === 'active');
@@ -99,22 +100,37 @@ export default function Timetable({
             >
               หมอนวด
             </div>
-            {timeSlots.map(slot => (
-              <div 
-                key={slot} 
-                style={{ 
-                  width: `${COLUMN_WIDTH}px`, 
-                  minWidth: `${COLUMN_WIDTH}px`, 
-                  textAlign: 'center', 
-                  fontSize: '0.62rem', 
-                  fontWeight: 700, 
-                  color: 'var(--text-secondary)',
-                  borderRight: '1px dashed rgba(0, 0, 0, 0.05)'
-                }}
-              >
-                {slot}
-              </div>
-            ))}
+            {timeSlots.map(slot => {
+              const showLabel = slot.endsWith(':00') || slot.endsWith(':30');
+              return (
+                <div 
+                  key={slot} 
+                  style={{ 
+                    width: `${COLUMN_WIDTH}px`, 
+                    minWidth: `${COLUMN_WIDTH}px`, 
+                    textAlign: 'left', 
+                    fontSize: '0.62rem', 
+                    fontWeight: 700, 
+                    color: 'var(--text-secondary)',
+                    borderLeft: slot.endsWith(':00') ? '1px solid var(--border-color)' : 'none',
+                    position: 'relative',
+                    height: '100%'
+                  }}
+                >
+                  {showLabel && (
+                    <span style={{ 
+                      position: 'absolute', 
+                      left: '2px', 
+                      top: '12px',
+                      whiteSpace: 'nowrap',
+                      zIndex: 5
+                    }}>
+                      {slot}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* 2. Masseuse Rows */}
@@ -176,13 +192,16 @@ export default function Timetable({
                     
                     // Convert startTime (HH:MM) to minutes
                     const [sh, sm] = booking.startTime.split(':').map(Number);
-                    const startMin = sh * 60 + sm;
+                    let startMin = sh * 60 + sm;
+                    if (sh < START_HOUR) {
+                      startMin += 24 * 60;
+                    }
                     const baseMin = START_HOUR * 60;
                     const diffMin = startMin - baseMin;
                     
-                    // Position calculations
-                    const left = (diffMin / 30) * COLUMN_WIDTH;
-                    const width = (booking.duration / 30) * COLUMN_WIDTH;
+                    // Position calculations (5-min intervals)
+                    const left = (diffMin / 5) * COLUMN_WIDTH;
+                    const width = (booking.duration / 5) * COLUMN_WIDTH;
 
                     const serviceType = service ? service.type : 'other-massage';
 
@@ -225,48 +244,6 @@ export default function Timetable({
           })}
         </div>
       </div>
-
-      {/* Chronological Bookings List Summary */}
-      <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
-        <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
-          ลำดับคิวงานบริการวันนี้ (เรียงตามเวลา)
-        </h4>
-        {dateBookings.length === 0 ? (
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '1rem 0' }}>
-            ไม่มีคิวงานลงทะเบียนในวันนี้
-          </div>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table className="user-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: 700, fontSize: '0.75rem' }}>เวลา</th>
-                  <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: 700, fontSize: '0.75rem' }}>หมอนวด</th>
-                  <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: 700, fontSize: '0.75rem' }}>บริการ</th>
-                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: 700, fontSize: '0.75rem' }}>ระยะเวลา</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dateBookings
-                  .sort((a, b) => a.startTime.localeCompare(b.startTime))
-                  .map((b) => {
-                    const masseuse = masseuses.find(m => m.id === b.masseuseId);
-                    const service = services.find(s => s.id === b.serviceId);
-                    return (
-                      <tr key={b.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                        <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--color-gold)' }}>{b.startTime}</td>
-                        <td style={{ padding: '10px 12px', fontWeight: 700, color: 'var(--text-primary)' }}>{masseuse ? masseuse.nickname : 'ไม่ระบุ'}</td>
-                        <td style={{ padding: '10px 12px', color: 'var(--text-primary)' }}>{service ? service.name : 'บริการสปา'}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--text-secondary)' }}>{b.duration} นาที</td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
     </div>
   );
 }

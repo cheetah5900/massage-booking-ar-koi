@@ -59,10 +59,27 @@ export default function BookingModal({ isOpen, onClose, booking, masseuses, serv
             className="btn-danger" 
             style={{ padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem' }}
             onClick={() => {
-              if (confirm('คุณต้องการลบคิวจองนี้ใช่หรือไม่?')) {
-                onDelete(booking.id);
-                onClose();
-              }
+              window.Swal.fire({
+                title: 'ยืนยันการลบคิว',
+                text: 'คุณต้องการลบคิวจองนี้ใช่หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--color-coral)',
+                cancelButtonColor: 'var(--text-muted)',
+                confirmButtonText: 'ลบคิว',
+                cancelButtonText: 'ยกเลิก'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  onDelete(booking.id);
+                  onClose();
+                  window.Swal.fire({
+                    title: 'ลบสำเร็จ',
+                    text: 'คิวจองได้รับการลบเรียบร้อยแล้ว',
+                    icon: 'success',
+                    confirmButtonColor: 'var(--color-gold)'
+                  });
+                }
+              });
             }}
           >
             <Trash2 size={15} /> ลบคิวจองนี้

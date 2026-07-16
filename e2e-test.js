@@ -15,7 +15,7 @@ import puppeteer from 'puppeteer';
   await page.setViewport({ width: 1280, height: 800 });
   
   try {
-    // 1. Navigate to login page
+    // 1. Navigate to main page
     console.log('🌐 Navigating to http://localhost:5174...');
     await page.goto('http://localhost:5174', { waitUntil: 'networkidle0' });
     
@@ -33,31 +33,17 @@ import puppeteer from 'puppeteer';
     });
     console.log('✅ Database reset complete!');
     
-    // Reload page to ensure React state is fully synchronized with empty database
+    // Reload page
     console.log('🔄 Reloading page...');
     await page.reload({ waitUntil: 'networkidle0' });
     
-    // Check if on login page
-    const loginTitle = await page.$eval('h2', el => el.textContent);
-    console.log(`✅ Loaded page with header: "${loginTitle}"`);
-    if (loginTitle !== 'จิรภัทร์') {
-      throw new Error(`Expected login page title to be "จิรภัทร์", got "${loginTitle}"`);
+    const pageTitle = await page.$eval('.logo-text', el => el.textContent);
+    console.log(`✅ Loaded page with header: "${pageTitle}"`);
+    if (pageTitle !== 'จิรภัทร์') {
+      throw new Error(`Expected page header to be "จิรภัทร์", got "${pageTitle}"`);
     }
     
-    // 2. Perform login
-    console.log('🔑 Typing credentials...');
-    await page.type('input[placeholder="เช่น admin, staff1"]', 'admin');
-    await page.type('input[placeholder="ป้อนรหัสผ่าน"]', 'password123');
-    
-    console.log('🖱️ Clicking login button...');
-    await Promise.all([
-      page.click('button[type="submit"]'),
-      page.waitForFunction(() => document.querySelector('.app-header') !== null, { timeout: 8000 })
-    ]);
-    
-    console.log('✅ Logged in successfully! Header dashboard is visible.');
-    
-    // Switch to booking form tab (second button on desktop nav bar)
+    // Switch to booking form tab (second button on desktop nav bar: "ตารางลงคิว")
     console.log('👉 Switching to "ตารางลงคิว" tab...');
     const tabBtns = await page.$$('.tab-btn');
     if (tabBtns.length < 2) {
@@ -65,18 +51,14 @@ import puppeteer from 'puppeteer';
     }
     await tabBtns[1].click(); // click second button (ตารางลงคิว)
     
-    // 3. Verify user display name
-    const displayName = await page.$eval('.user-name', el => el.textContent);
-    console.log(`👤 Logged in as: "${displayName}"`);
-    
-    // 4. Verify timetable container is present
+    // 2. Verify timetable container is present
     const timetableVisible = await page.$('.timetable-container') !== null;
     console.log(`📅 Timetable grid rendered: ${timetableVisible}`);
     if (!timetableVisible) {
-      throw new Error('Timetable container was not found on the page after login!');
+      throw new Error('Timetable container was not found on the page!');
     }
     
-    // 5. Test booking creation
+    // 3. Test booking creation
     console.log('📝 Attempting to register a new booking queue...');
     
     // Check how many bookings currently exist on the grid
@@ -115,12 +97,13 @@ import puppeteer from 'puppeteer';
     console.log('🖱️ Clicking "ลงทะเบียนจองคิว" button...');
     await page.click('button[type="submit"]');
     
-    // Wait for success alert to show up
-    await page.waitForFunction(() => {
-      const el = document.body;
-      return el.innerHTML.includes('จองคิวนวดสำเร็จ!');
-    }, { timeout: 5000 });
-    console.log('✅ Booking success alert verified!');
+    // Wait for SweetAlert2 success popup to show up
+    console.log('⏳ Waiting for SweetAlert2 success popup...');
+    await page.waitForSelector('.swal2-popup', { timeout: 5000 });
+    console.log('✅ SweetAlert2 success alert verified!');
+    
+    // Click the SweetAlert2 confirm button to close it
+    await page.click('.swal2-confirm');
     
     // Verify booking card count increased
     await page.waitForFunction((initialCount) => {
@@ -130,14 +113,6 @@ import puppeteer from 'puppeteer';
     
     const finalBookingCount = await page.$$eval('.booking-card', cards => cards.length);
     console.log(`🎉 Booking card created successfully! Count went from ${initialBookingCount} to ${finalBookingCount}.`);
-    
-    // 6. Test logout
-    console.log('🚪 Clicking logout button...');
-    await page.click('button[title="ออกจากระบบ"]');
-    
-    // Wait back for login page to render
-    await page.waitForSelector('input[placeholder="เช่น admin, staff1"]', { timeout: 5000 });
-    console.log('✅ Logged out successfully! Login form input fields are back.');
     
     console.log('\n🌟 ALL E2E TESTS PASSED SUCCESSFULLY! 🌟');
     process.exit(0);
