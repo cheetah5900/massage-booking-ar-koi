@@ -389,8 +389,7 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
                                 {isMasseuse ? item.nickname : item.name}
                               </span>
                               
-                              {/* In-Use Indicators */}
-                              {inUse ? (
+                              {inUse && (
                                 <span style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -403,20 +402,6 @@ export default function ManageModal({ isOpen, onClose, type, items, onSave, onDe
                                   borderRadius: '4px'
                                 }}>
                                   <AlertCircle size={10} /> ใช้งานอยู่
-                                </span>
-                              ) : (
-                                <span style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '2px',
-                                  fontSize: '0.6rem',
-                                  fontWeight: 700,
-                                  color: '#0d9488',
-                                  backgroundColor: '#ccfbf1',
-                                  padding: '1px 6px',
-                                  borderRadius: '4px'
-                                }}>
-                                  <CheckCircle2 size={10} /> ว่าง (ลบได้)
                                 </span>
                               )}
                             </div>
