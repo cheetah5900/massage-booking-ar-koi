@@ -344,9 +344,6 @@ export default function App() {
 
 
 
-  // Calculate statistics for display
-  const activeToday = bookings.filter(b => b.date === bookingDate && b.status === 'active').length;
-  const completedToday = bookings.filter(b => b.date === bookingDate && b.status === 'completed').length;
 
   return (
     <div className="app-container">
@@ -382,16 +379,6 @@ export default function App() {
                 <Calendar size={14} /> ตารางลงคิว
               </button>
             </nav>
-
-            {/* Header Stats Badges */}
-            <div className="header-stats" style={{ display: 'flex', gap: '8px', marginRight: '0.75rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: '100px', backgroundColor: 'var(--color-gold-light)', color: 'var(--color-gold)', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
-                <span style={{ width: '6px', height: '6px', backgroundColor: 'var(--color-gold)', borderRadius: '50%' }}></span> คิวค้าง: {activeToday}
-              </span>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: '100px', backgroundColor: 'var(--color-sage-light)', color: 'var(--color-sage)', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
-                <span style={{ width: '6px', height: '6px', backgroundColor: 'var(--color-sage)', borderRadius: '50%' }}></span> เสร็จ: {completedToday}
-              </span>
-            </div>
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -614,18 +601,7 @@ export default function App() {
               </button>
             </div>
 
-            {/* Stats */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', marginBottom: '1.25rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>สรุปสถานะประจำวัน</span>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <span style={{ flex: 1, fontSize: '0.75rem', fontWeight: 700, padding: '6px 12px', borderRadius: '8px', backgroundColor: 'var(--color-gold-light)', color: 'var(--color-gold)', display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
-                  คิวค้าง: {activeToday}
-                </span>
-                <span style={{ flex: 1, fontSize: '0.75rem', fontWeight: 700, padding: '6px 12px', borderRadius: '8px', backgroundColor: 'var(--color-sage-light)', color: 'var(--color-sage)', display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
-                  เสร็จ: {completedToday}
-                </span>
-              </div>
-            </div>
+
 
           </div>
         </div>
