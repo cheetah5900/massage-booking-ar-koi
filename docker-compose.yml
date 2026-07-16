@@ -1,0 +1,17 @@
+services:
+  massage-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: massage_queue_app
+    ports:
+      - "5001:5001"
+    volumes:
+      - massage_data:/app/data
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+
+volumes:
+  massage_data:
