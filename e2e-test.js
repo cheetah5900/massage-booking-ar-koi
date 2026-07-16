@@ -43,7 +43,6 @@ import puppeteer from 'puppeteer';
       throw new Error(`Expected page header to be "จิรภัทร์", got "${pageTitle}"`);
     }
     
-
     // 2. Verify timetable container is present
     const timetableVisible = await page.$('.timetable-container') !== null;
     console.log(`📅 Timetable grid rendered: ${timetableVisible}`);
@@ -58,33 +57,35 @@ import puppeteer from 'puppeteer';
     const initialBookingCount = await page.$$eval('.booking-card', cards => cards.length);
     console.log(`ℹ️ Initial booking count on grid: ${initialBookingCount}`);
     
-    // Click SearchableSelect for services (the first wrapper)
+    // Get native select elements
+    const selectElements = await page.$$('select');
+    if (selectElements.length < 2) {
+      throw new Error('Could not find enough select elements in the booking form');
+    }
+    
+    // Select service option (first select element)
     console.log('👉 Selecting Service...');
-    await page.click('.search-select-trigger'); 
+    const serviceValue = await page.evaluate((el) => {
+      const options = el.querySelectorAll('option');
+      return options.length > 1 ? options[1].value : '';
+    }, selectElements[0]);
+    await page.evaluate((el, val) => {
+      el.value = val;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    }, selectElements[0], serviceValue);
+    console.log(`✅ Service selected: ${serviceValue}`);
     
-    // Wait for dropdown popover list options to show up
-    await page.waitForSelector('.search-select-dropdown', { timeout: 3000 });
-    
-    // Click the first service option
-    await page.click('.search-select-option');
-    console.log('✅ Service selected!');
-    
-    // Click SearchableSelect for masseuses (the second wrapper)
+    // Select masseuse option (second select element)
     console.log('👉 Selecting Masseuse...');
-    const selectContainers = await page.$$('.search-select-trigger');
-    if (selectContainers.length < 2) {
-      throw new Error('Could not find second SearchableSelect for masseuse');
-    }
-    await selectContainers[1].click(); // open masseuse dropdown
-    await page.waitForSelector('.search-select-dropdown', { timeout: 3000 });
-    
-    // Click the first active masseuse option
-    const options = await page.$$('.search-select-option');
-    if (options.length === 0) {
-      throw new Error('No options visible in masseuse dropdown');
-    }
-    await options[0].click();
-    console.log('✅ Masseuse selected!');
+    const masseuseValue = await page.evaluate((el) => {
+      const options = el.querySelectorAll('option');
+      return options.length > 1 ? options[1].value : '';
+    }, selectElements[1]);
+    await page.evaluate((el, val) => {
+      el.value = val;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    }, selectElements[1], masseuseValue);
+    console.log(`✅ Masseuse selected: ${masseuseValue}`);
     
     // Click submit button
     console.log('🖱️ Clicking "ลงทะเบียนจองคิว" button...');

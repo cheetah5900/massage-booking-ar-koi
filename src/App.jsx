@@ -411,12 +411,18 @@ export default function App() {
                     <button type="button" className="btn-manage-inline" style={{ fontSize: '0.65rem' }} onClick={() => setManageModalType('service')}>จัดการ</button>
                   )}
                 </div>
-                <SearchableSelect
-                  options={services.map(s => ({ id: s.id, name: s.name }))}
+                <select
                   value={bookingServiceId}
-                  onChange={handleServiceChange}
-                  placeholder="ค้นหาบริการ..."
-                />
+                  onChange={(e) => handleServiceChange(e.target.value)}
+                  className="form-select"
+                  style={{ padding: '0.55rem 0.75rem', fontSize: '0.85rem' }}
+                  required
+                >
+                  <option value="">-- เลือกประเภทบริการ --</option>
+                  {services.map(s => (
+                    <option key={s.id} value={s.id}>{s.name} ({s.duration} นาที - {s.price} บาท)</option>
+                  ))}
+                </select>
               </div>
 
               {/* 2. Masseuse Selection */}
@@ -427,13 +433,18 @@ export default function App() {
                     <button type="button" className="btn-manage-inline" style={{ fontSize: '0.65rem' }} onClick={() => setManageModalType('masseuse')}>จัดการ</button>
                   )}
                 </div>
-                <SearchableSelect
-                  options={masseuses.filter(m => m.status === 'active').map(m => ({ id: m.id, name: m.nickname }))}
+                <select
                   value={bookingMasseuseId}
-                  onChange={setBookingMasseuseId}
-                  placeholder="ค้นหาชื่อหมอนวด..."
-                  emptyMessage="ไม่มีหมอนวดพร้อมให้บริการ"
-                />
+                  onChange={(e) => setBookingMasseuseId(e.target.value)}
+                  className="form-select"
+                  style={{ padding: '0.55rem 0.75rem', fontSize: '0.85rem' }}
+                  required
+                >
+                  <option value="">-- เลือกหมอนวด --</option>
+                  {masseuses.filter(m => m.status === 'active').map(m => (
+                    <option key={m.id} value={m.id}>{m.nickname}</option>
+                  ))}
+                </select>
               </div>
 
               {/* 3. Start Time Selection */}
