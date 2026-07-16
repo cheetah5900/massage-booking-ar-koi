@@ -41,11 +41,32 @@ const readDB = () => {
       fs.mkdirSync(dir, { recursive: true });
     }
     const initialData = {
-      masseuses: [],
-      services: [],
-      users: [],
+      masseuses: [
+        { id: 'm1', nickname: 'พี่นก', status: 'active' },
+        { id: 'm2', nickname: 'พี่บี', status: 'active' },
+        { id: 'm3', nickname: 'พี่ฝน', status: 'active' },
+        { id: 'm4', nickname: 'พี่แก้ว', status: 'active' }
+      ],
+      services: [
+        { id: 's1', name: 'นวดไทย', type: 'thai-massage', duration: 60, price: 350 },
+        { id: 's2', name: 'นวดอโรมา', type: 'oil-massage', duration: 90, price: 600 },
+        { id: 's3', name: 'นวดเท้า', type: 'foot-massage', duration: 60, price: 300 },
+        { id: 's4', name: 'นวดประคบสมุนไพร (Herbal Compress)', type: 'thai-massage', duration: 90, price: 500 },
+        { id: 's5', name: 'นวดคอบ่าไหล่ (Neck & Shoulder)', type: 'other-massage', duration: 60, price: 250 }
+      ],
+      users: [
+        { username: 'admin', password: 'password123', displayName: 'เจ้าของร้าน (คุณมนต์)', role: 'admin' },
+        { username: 'staff1', password: '123456', displayName: 'พนักงานหน้าร้าน (ฟ้า)', role: 'user' },
+        { username: 'staff2', password: '123456', displayName: 'แคชเชียร์ (ตั้ม)', role: 'user' }
+      ],
       bookings: [],
-      durations: []
+      durations: [
+        { id: 'd30', name: '30 นาที', minutes: 30 },
+        { id: 'd60', name: '60 นาที', minutes: 60 },
+        { id: 'd90', name: '90 นาที', minutes: 90 },
+        { id: 'd120', name: '120 นาที', minutes: 120 },
+        { id: 'd180', name: '180 นาที', minutes: 180 }
+      ]
     };
     fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2), 'utf8');
     return initialData;

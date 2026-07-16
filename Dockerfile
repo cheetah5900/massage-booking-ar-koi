@@ -13,8 +13,6 @@ COPY package*.json ./
 RUN npm install --only=production
 COPY --from=builder /app/dist ./dist
 COPY server.js ./
-# Copy data directory (containing the initial database seed)
-COPY data ./data
 
 EXPOSE 5001
 
