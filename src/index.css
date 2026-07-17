@@ -608,35 +608,35 @@ button, input, select, textarea {
 
 /* Color codes by service status or type */
 .booking-card.thai-massage {
-  background-color: #eff6ff; /* light blue bg */
-  color: #1e40af;            /* deep blue text */
-  border: 1px solid #bfdbfe; /* blue border */
+  background-color: #2563eb; /* Vibrant Royal Blue */
+  color: #ffffff;            /* Crisp White text */
+  border: 1px solid #1d4ed8;
 }
 
 .booking-card.oil-massage {
-  background-color: #f0f9ff; /* light sky bg */
-  color: #0369a1;            /* deep sky text */
-  border: 1px solid #bae6fd; /* sky border */
+  background-color: #0284c7; /* Vibrant Sky Blue */
+  color: #ffffff;            /* Crisp White text */
+  border: 1px solid #0369a1;
 }
 
 .booking-card.foot-massage {
-  background-color: #f0fdfa; /* light teal bg */
-  color: #0d9488;            /* deep teal text */
-  border: 1px solid #ccfbf1; /* teal border */
+  background-color: #0d9488; /* Vibrant Teal */
+  color: #ffffff;            /* Crisp White text */
+  border: 1px solid #0f766e;
 }
 
 .booking-card.other-massage {
-  background-color: #f8fafc; /* light slate bg */
-  color: #475569;            /* deep slate text */
-  border: 1px solid #e2e8f0; /* slate border */
+  background-color: #6366f1; /* Vibrant Indigo */
+  color: #ffffff;            /* Crisp White text */
+  border: 1px solid #4f46e5;
 }
 
 .booking-card.completed {
-  background-color: #f1f5f9; /* soft gray bg */
-  color: #94a3b8;            /* muted text */
-  border: 1px solid #e2e8f0; /* gray border */
+  background-color: #94a3b8; /* Muted Slate Gray */
+  color: rgba(255, 255, 255, 0.85); /* Faded white text */
+  border: 1px solid #64748b;
   text-decoration: line-through;
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 .booking-title {

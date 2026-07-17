@@ -16,8 +16,8 @@ import puppeteer from 'puppeteer';
   
   try {
     // 1. Navigate to main page
-    console.log('🌐 Navigating to http://localhost:5174...');
-    await page.goto('http://localhost:5174', { waitUntil: 'networkidle0' });
+    console.log('🌐 Navigating to http://localhost:5173...');
+    await page.goto('http://localhost:5173', { waitUntil: 'networkidle0' });
     
     // Reset database to clean state
     console.log('🔄 Resetting database bookings for testing...');
