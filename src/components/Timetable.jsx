@@ -9,24 +9,21 @@ export default function Timetable({
   services,
   onBookingClick 
 }) {
-  // Operating hours configuration (10:00 - 01:00 next day)
-  // Total 15 hours = 180 slots (5-minute intervals)
+  // Operating hours configuration (10:00 - 23:00)
+  // Total 13 hours = 156 slots (5-minute intervals)
   const START_HOUR = 10;
   const COLUMN_WIDTH = 12; // width of each 5-min slot in pixels
 
-  // Generate array of 5-minute time slots
+  // Generate array of 5-minute time slots (10:00 - 23:00)
   const timeSlots = [];
-  for (let h = 10; h <= 24; h++) {
-    let displayHour = h;
-    if (h >= 24) displayHour = h - 24;
-    const hourStr = String(displayHour).padStart(2, '0');
-    
+  for (let h = 10; h <= 22; h++) {
+    const hourStr = String(h).padStart(2, '0');
     for (let m = 0; m < 60; m += 5) {
       const minStr = String(m).padStart(2, '0');
       timeSlots.push(`${hourStr}:${minStr}`);
     }
   }
-  timeSlots.push("01:00");
+  timeSlots.push("23:00");
 
   // Filter active masseuses
   const activeMasseuses = masseuses.filter(m => m.status === 'active');

@@ -23,22 +23,11 @@ const cleanExpiredBookings = (bookings) => {
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
   const todayStr = `${year}-${month}-${day}`;
-  const currentHour = now.getHours();
 
   return bookings.filter(b => {
     try {
-      // Keep today's and future bookings
-      if (b.date >= todayStr) {
-        return true;
-      }
-      
-      // Keep yesterday's bookings only if we haven't reached 2:00 AM of the new day yet
-      // (This preserves overnight bookings running up to 01:00 AM closing time)
-      if (b.date < todayStr && currentHour < 2) {
-        return true;
-      }
-      
-      return false; // Expired
+      // Keep only today's and future bookings (past days are cleared immediately at midnight)
+      return b.date >= todayStr;
     } catch (e) {
       console.error('Error parsing booking date:', b, e);
       return true; // Keep if error to avoid accidental data loss

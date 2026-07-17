@@ -27,18 +27,15 @@ import BookingModal from './components/BookingModal';
 import AdminPanel from './components/AdminPanel';
 import SearchableSelect from './components/SearchableSelect';
 
-// 5-minute slot options (10:00 - 01:00 next day)
+// 5-minute slot options (10:00 - 23:00)
 const START_TIME_OPTIONS = [];
-for (let h = 10; h <= 23; h++) {
+for (let h = 10; h <= 22; h++) {
   const hourStr = String(h).padStart(2, '0');
   for (let m = 0; m < 60; m += 5) {
     START_TIME_OPTIONS.push(`${hourStr}:${String(m).padStart(2, '0')}`);
   }
 }
-for (let m = 0; m < 60; m += 5) {
-  START_TIME_OPTIONS.push(`00:${String(m).padStart(2, '0')}`);
-}
-START_TIME_OPTIONS.push("01:00");
+START_TIME_OPTIONS.push("23:00");
 
 export default function App() {
   // --- STATE ---
@@ -250,18 +247,15 @@ export default function App() {
       return;
     }
 
-    // Check operating hours (10:00 - 01:00 next day)
+    // Check operating hours (10:00 - 23:00)
     const [sh, sm] = bookingStartTime.split(':').map(Number);
-    let startMin = sh * 60 + sm;
-    if (sh < 10) {
-      startMin += 24 * 60;
-    }
+    const startMin = sh * 60 + sm;
     const endMin = startMin + bookingDuration;
-    if (startMin < 10 * 60 || endMin > 25 * 60) {
+    if (startMin < 10 * 60 || endMin > 23 * 60) {
       window.Swal.fire({
         icon: 'error',
         title: 'อยู่นอกเวลาทำการ',
-        text: 'เวลาให้บริการต้องอยู่ระหว่าง 10:00 - 01:00 น. วันถัดไป',
+        text: 'เวลาให้บริการต้องอยู่ระหว่าง 10:00 - 23:00 น.',
         confirmButtonColor: 'var(--color-gold)'
       });
       return;
