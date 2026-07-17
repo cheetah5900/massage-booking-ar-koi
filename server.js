@@ -17,15 +17,28 @@ app.use(express.json());
 // Helper to filter bookings older than 24 hours
 const cleanExpiredBookings = (bookings) => {
   const now = new Date();
+  
+  // Format local date string (YYYY-MM-DD)
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const todayStr = `${year}-${month}-${day}`;
+  const currentHour = now.getHours();
+
   return bookings.filter(b => {
     try {
-      // Combine date (YYYY-MM-DD) and end time (HH:MM)
-      const endDateTime = new Date(`${b.date}T${b.endTime}`);
-      const diffMs = now.getTime() - endDateTime.getTime();
-      const diffHours = diffMs / (1000 * 60 * 60);
+      // Keep today's and future bookings
+      if (b.date >= todayStr) {
+        return true;
+      }
       
-      // Keep booking if finished less than 24 hours ago, OR if it finishes in the future
-      return diffHours <= 24;
+      // Keep yesterday's bookings only if we haven't reached 2:00 AM of the new day yet
+      // (This preserves overnight bookings running up to 01:00 AM closing time)
+      if (b.date < todayStr && currentHour < 2) {
+        return true;
+      }
+      
+      return false; // Expired
     } catch (e) {
       console.error('Error parsing booking date:', b, e);
       return true; // Keep if error to avoid accidental data loss
